@@ -6,7 +6,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 # from bs4 import beautifulsoup
 
 login = ''
-parol = ''
+password = ''
 TOKEN = "5379058684:AAFD4kCxjJDJrhVuqAdbYbceNlGD3nasObw"
 
 
@@ -35,7 +35,7 @@ async def process_callback_button1(callback_query: types.CallbackQuery):
         await bot.answer_callback_query(callback_query.id)
         await bot.send_message(callback_query.from_user.id, 'Введите логин в формате\n/login *ваш логин*')
     else:
-        marks.marks(login, parol)
+        marks.marks(login, password)
 
 
 @dp.message_handler(commands=['login'])
@@ -43,21 +43,21 @@ async def cmd_name(message: types.Message, command: {}):
     global login
     if command.args:
         login = command.args
-        await message.answer("Введите пароль в формате\n/parol *ваш пароль*")
+        await message.answer("Введите пароль в формате\n/password *ваш пароль*")
     else:
-        await message.answer("Пожалуйста, укажи свой логин после команды /parol!")
+        await message.answer("Пожалуйста, укажи свой логин после команды /passsword!")
 
 
 @dp.callback_query_handler(lambda c: c.data == 'last')
 async def process_callback_button1(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
-    await bot.send_message(callback_query.from_user.id, marks.last_w(login, parol), reply_markup=inline_kb_nl)
+    await bot.send_message(callback_query.from_user.id, marks.last_w(login, password), reply_markup=inline_kb_nl)
 
 
 @dp.callback_query_handler(lambda c: c.data == 'next')
 async def process_callback_button1(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
-    await bot.send_message(callback_query.from_user.id, marks.next_w(login, parol), reply_markup=inline_kb_nl)
+    await bot.send_message(callback_query.from_user.id, marks.next_w(login, password), reply_markup=inline_kb_nl)
 
 
 @dp.callback_query_handler(lambda c: c.data == 'n')
@@ -66,13 +66,13 @@ async def process_callback_button1(callback_query: types.CallbackQuery):
     await bot.send_message(callback_query.from_user.id, "Что тебе нужно?", reply_markup=inline_kb_full)
 
 
-@dp.message_handler(commands=['parol'])
+@dp.message_handler(commands=['password'])
 async def cmd_name(message: types.Message, command: {}):
-    global parol
+    global password
     if command.args:
-        parol = command.args
+        password = command.args
         try:
-            await message.answer(marks.marks(login, parol), reply_markup=inline_kb_nl)
+            await message.answer(marks.marks(login, password), reply_markup=inline_kb_nl)
         except:
             await message.answer("Пожалуйста, укажи верные данные для edu.tatr\nПопробуй снова")
     else:

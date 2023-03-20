@@ -51,11 +51,11 @@ def marks(log, par, ur='https://edu.tatar.ru/user/diary/week'):
         if data.find('div') is not None:
             subject.append(data.text)
 
-    hometasks = soup.find_all(class_='tt-task')
-    hometask = []
-    for data in hometasks:
-        if data.find('div') is not None:
-            hometask.append(data.text)
+    #hometasks = soup.find_all(class_='tt-task')
+    #hometask = []
+    #for data in hometasks:
+    #    if data.find('div') is not None:
+    #        hometask.append(data.text)
 
     dates = []
     day_numb = 1
@@ -73,8 +73,12 @@ def marks(log, par, ur='https://edu.tatar.ru/user/diary/week'):
 
     for i in range(len(subject) - 1):
         if less == 8:
-            result.append(dates[day_numb].strip() + ', ' + week_days1[day_numb - 1] if week == 1
-                          else week_days2[day_numb - 1])
+            result.append('\n')
+            if week == 1:
+                result.append(dates[day_numb].strip() + ', ' + week_days1[day_numb - 1])
+            else:
+                result.append(dates[day_numb].strip() + ', ' + week_days2[day_numb - 1])
+            result.append('\n')
             less = 0
             if day_numb < 3:
                 day_numb += 1
@@ -82,29 +86,33 @@ def marks(log, par, ur='https://edu.tatar.ru/user/diary/week'):
                 day_numb = 1
 
         if subject[i].strip() != '':
-            result.append(subject[i].strip())
-            result.append("Д/З: " + hometask[i].strip())
-            result.append("Оценка: " + mark[i].strip() if mark[i] != '\n\n' else '-')
+            result.append(str(less) + ')' + subject[i].strip() + ': ')
+            result.append(mark[i].strip() if mark[i] != '\n\n' else '')
+            result.append('\n')
+            #result.append("Д/З: " + hometask[i].strip())
+            #result.append("Оценка: " + mark[i].strip() if mark[i] != '\n\n' else '-')
             result.append('')
         less += 1
-    return '\n'.join(result)
+    return ''.join(result)
 
 
-def next_w(log, par, url='https://edu.tatar.ru/user/diary/week'):
+def next_w(log, par):
     global url_active
-    pr_res = auth(log, par, url)
+    pr_res = auth(log, par, url_active)
     soup = BeautifulSoup(pr_res.text, "html.parser")
     next_week = soup.find_all(class_="g-button-blue")
     new_url = str(next_week[1]['href'])
     url_active = new_url
+    print(url_active)
     return marks(log, par, url_active)
 
 
-def last_w(log, par, url='https://edu.tatar.ru/user/diary/week'):
+def last_w(log, par):
     global url_active
-    pr_res = auth(log, par, url)
+    pr_res = auth(log, par, url_active)
     soup = BeautifulSoup(pr_res.text, "html.parser")
     next_week = soup.find_all(class_="g-button-blue")
     new_url = str(next_week[0]['href'])
     url_active = new_url
+    print(url_active)
     return marks(log, par, url_active)
