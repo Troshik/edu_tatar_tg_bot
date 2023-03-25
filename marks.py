@@ -5,8 +5,6 @@ from bs4 import BeautifulSoup
 week_days1 = ['Понедельник', 'Вторник', 'Среда']
 week_days2 = ['Четверг', 'Пятница', 'Суббота']
 
-url_active = 'https://edu.tatar.ru/user/diary/week'
-
 
 def auth(login, par, pr='https://edu.tatar.ru/user/diary/week'):
     session = requests.Session()
@@ -36,7 +34,7 @@ def auth(login, par, pr='https://edu.tatar.ru/user/diary/week'):
     return pr_res
 
 
-def marks(log, par, ur=url_active, obj=None):
+def marks(log, par, ur='https://edu.tatar.ru/user/diary/week', obj=None):
     result = []
     pr_res = auth(log, par, ur)
     soup = BeautifulSoup(pr_res.text, "html.parser")
@@ -67,7 +65,7 @@ def marks(log, par, ur=url_active, obj=None):
             dates.append(w.text)
 
     d = soup.find_all(class_="tt-days-mo")
-    if d is not None:
+    if d != []:
         week = 1
     else:
         week = 2
@@ -87,7 +85,8 @@ def marks(log, par, ur=url_active, obj=None):
                 day_numb = 1
 
         if subject[i].strip() != '':
-            result.append(str(less) + ')' + subject[i].strip())
+            result.append(str(less) + ')')
+            result.append(subject[i].strip())
             if obj == 'mark':
                 result.append(': ' + mark[i].strip() if mark[i] != '\n\n' else '')
             elif obj == 'task':
@@ -97,24 +96,17 @@ def marks(log, par, ur=url_active, obj=None):
     return ''.join(result)
 
 
-def next_w(log, par):
-    global url_active
+def next_w(log, par, url_active):
     pr_res = auth(log, par, url_active)
     soup = BeautifulSoup(pr_res.text, "html.parser")
     next_week = soup.find_all(class_="g-button-blue")
-    try:
-        new_url = str(next_week[1]['href'])
-        url_active = new_url
-        return marks(log, par, url_active)
-    except:
-        return 'Еще недоступно'
+    new_url = str(next_week[1]['href'])
+    return new_url
 
 
-def last_w(log, par):
-    global url_active
+def last_w(log, par, url_active):
     pr_res = auth(log, par, url_active)
     soup = BeautifulSoup(pr_res.text, "html.parser")
     next_week = soup.find_all(class_="g-button-blue")
     new_url = str(next_week[0]['href'])
-    url_active = new_url
-    return marks(log, par, url_active)
+    return new_url
