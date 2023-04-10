@@ -65,7 +65,7 @@ def marks(log, par, ur='https://edu.tatar.ru/user/diary/week', obj=None):
             dates.append(w.text)
 
     d = soup.find_all(class_="tt-days-mo")
-    if d != []:
+    if d is bool:
         week = 1
     else:
         week = 2
@@ -110,3 +110,34 @@ def last_w(log, par, url_active):
     next_week = soup.find_all(class_="g-button-blue")
     new_url = str(next_week[0]['href'])
     return new_url
+
+
+def tab(log, par, obj):
+    pr_res = auth(log, par, 'https://edu.tatar.ru/user/diary/term')
+    soup = BeautifulSoup(pr_res.text, "html.parser")
+    tabl = soup.find_all('td')
+    tab_marks = []
+    tabel = []
+    for data in tabl:
+        if data.text != '':
+            tab_marks.append(data.text.strip())
+    if obj == 'marks':
+        for elem in tab_marks[5:-4]:
+            if elem.isnumeric():
+                tabel.append(elem + ' ')
+            elif ''.join(elem.split()).isalpha():
+                if elem != 'просмотр':
+                    tabel.append('\n')
+                    tabel.append(elem + ': ')
+    elif obj == 'average':
+        for elem in tab_marks[5:-4]:
+            try:
+                if elem.isnumeric() is False:
+                    tabel.append(str(float(elem)))
+            except:
+                if ''.join(elem.split()).isalpha():
+                    if elem != 'просмотр':
+                        tabel.append('\n')
+                        tabel.append(elem + ': ')
+
+    return ''.join(tabel)
