@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 
-
+alf = 'йцукенгшщзхъфывапролджэячсмитьбюё()ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ'
 week_days1 = ['Понедельник', 'Вторник', 'Среда']
 week_days2 = ['Четверг', 'Пятница', 'Суббота']
 
@@ -123,10 +123,14 @@ def tab(log, par, obj):
             tab_marks.append(data.text.strip())
     if obj == 'marks':
         for elem in tab_marks[5:-4]:
+            T = True
+            for i in ''.join(elem.split()):
+                if i not in alf:
+                    T = False
             if elem.isnumeric():
                 tabel.append(elem + ' ')
-            elif ''.join(elem.split()).isalpha():
-                if elem != 'просмотр':
+            elif T:
+                if elem != 'просмотр' and elem != '':
                     tabel.append('\n')
                     tabel.append(elem + ': ')
     elif obj == 'average':
@@ -135,8 +139,12 @@ def tab(log, par, obj):
                 if elem.isnumeric() is False:
                     tabel.append(str(float(elem)))
             except:
-                if ''.join(elem.split()).isalpha():
-                    if elem != 'просмотр':
+                T = True
+                for i in ''.join(elem.split()):
+                    if i not in alf:
+                        T = False
+                if T:
+                    if elem != 'просмотр' and elem != '':
                         tabel.append('\n')
                         tabel.append(elem + ': ')
 
