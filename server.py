@@ -21,6 +21,7 @@ bot = Bot(token=config.TOKEN)
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 
+
 inline_kb_full = InlineKeyboardMarkup(row_width=1)\
     .add(InlineKeyboardButton('Мои оценки', callback_data='marks'))\
     .add(InlineKeyboardButton('Расписание звонков', callback_data='calls'))\
