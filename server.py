@@ -31,29 +31,29 @@ inline_kb_nl = InlineKeyboardMarkup(row_width=2)\
     .add(InlineKeyboardButton('Следущая страница', callback_data='next'))\
     .add(InlineKeyboardButton('Предыдущая страница', callback_data='last'))\
     .add(InlineKeyboardButton('Показать домашнее задание', callback_data='btn5'))\
-    .add(InlineKeyboardButton('Вернуться на главную', callback_data='menu1'))
+    .add(InlineKeyboardButton('Вернуться на главную', callback_data='menu'))
 
 inline_kb_nl2 = InlineKeyboardMarkup(row_width=2)\
     .add(InlineKeyboardButton('Следущая страница', callback_data='next'))\
     .add(InlineKeyboardButton('Предыдущая страница', callback_data='last'))\
     .add(InlineKeyboardButton('Показать оценки', callback_data='btn4'))\
-    .add(InlineKeyboardButton('Вернуться на главную', callback_data='menu1'))
+    .add(InlineKeyboardButton('Вернуться на главную', callback_data='menu'))
 
 inline_kb_nl3 = InlineKeyboardMarkup(row_width=2)\
     .add(InlineKeyboardButton('Показать средний балл', callback_data='btn6'))\
-    .add(InlineKeyboardButton('Вернуться на главную', callback_data='menu1'))
+    .add(InlineKeyboardButton('Вернуться на главную', callback_data='menu'))
 
 inline_kb_nl4 = InlineKeyboardMarkup(row_width=2)\
     .add(InlineKeyboardButton('Показать оценки', callback_data='btn7'))\
-    .add(InlineKeyboardButton('Вернуться на главную', callback_data='menu1'))
+    .add(InlineKeyboardButton('Вернуться на главную', callback_data='menu'))
 
 inline_kb_nl5 = InlineKeyboardMarkup(row_width=2)\
     .add(InlineKeyboardButton('Понедельник', callback_data='btn8'))\
     .add(InlineKeyboardButton('Другие дни', callback_data='btn9'))\
-    .add(InlineKeyboardButton('Вернуться на главную', callback_data='menu'))
+    .add(InlineKeyboardButton('Вернуться на главную', callback_data='menu1'))
 
 inline_kb_nl6 = InlineKeyboardMarkup(row_width=1)\
-    .add(InlineKeyboardButton('Вернуться на главную', callback_data='menu'))
+    .add(InlineKeyboardButton('Вернуться на главную', callback_data='menu1'))
 
 
 @dp.message_handler(commands=['start'])
@@ -153,7 +153,7 @@ async def process_callback_button1(callback_query: types.CallbackQuery, state: F
                            reply_markup=inline_kb_nl2)
 
 
-@dp.callback_query_handler(lambda c: c.data == 'menu1', state=UserState.url_active)
+@dp.callback_query_handler(lambda c: c.data == 'menu', state=UserState.url_active)
 async def process_callback_button1(callback_query: types.CallbackQuery, state: FSMContext):
     await state.reset_state(with_data=False)
     await bot.answer_callback_query(callback_query.id)
@@ -163,7 +163,7 @@ async def process_callback_button1(callback_query: types.CallbackQuery, state: F
     data['url_active'] = 'https://edu.tatar.ru/user/diary/week'
 
 
-@dp.callback_query_handler(lambda c: c.data == 'menu')
+@dp.callback_query_handler(lambda c: c.data == 'menu1')
 async def process_callback_button1(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
     await callback_query.message.delete()
@@ -188,8 +188,7 @@ async def process_callback_button1(
                                                         '6) 12:40 - 13:20 \n Вторая смена: \n '
                                                         '1) 13:25 - 14:05 \n 2) 14:15 - 14:55 \n '
                                                         '3) 15:05 - 15:45 \n 4) 15:50 - 16:30 \n '
-                                                        '5) 16:35 - 17:15 \n 6) 17:20 - 18:00',
-                           reply_markup=inline_kb_nl6)
+                                                        '5) 16:35 - 17:15 \n 6) 17:20 - 18:00', reply_markup=inline_kb_nl6)
 
 
 @dp.callback_query_handler(lambda c: c.data == 'btn9')

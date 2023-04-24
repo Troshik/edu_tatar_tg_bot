@@ -65,7 +65,7 @@ def marks(log, par, ur='https://edu.tatar.ru/user/diary/week', obj=None):
             dates.append(w.text)
 
     d = soup.find_all(class_="tt-days-mo")
-    if d is bool:
+    if d != []:
         week = 1
     else:
         week = 2
