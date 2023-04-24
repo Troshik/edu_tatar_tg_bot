@@ -22,38 +22,38 @@ storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 
 inline_kb_full = InlineKeyboardMarkup(row_width=1)\
-    .add(InlineKeyboardButton('Мои оценки', callback_data='btn1'))\
-    .add(InlineKeyboardButton('Расписание звонков', callback_data='btn2'))\
-    .add(InlineKeyboardButton('Табель оценок', callback_data='btn3'))\
+    .add(InlineKeyboardButton('Мои оценки', callback_data='marks'))\
+    .add(InlineKeyboardButton('Расписание звонков', callback_data='calls'))\
+    .add(InlineKeyboardButton('Табель оценок', callback_data='tabel'))\
 
 
 inline_kb_nl = InlineKeyboardMarkup(row_width=2)\
     .add(InlineKeyboardButton('Следущая страница', callback_data='next'))\
     .add(InlineKeyboardButton('Предыдущая страница', callback_data='last'))\
-    .add(InlineKeyboardButton('Показать домашнее задание', callback_data='btn5'))\
+    .add(InlineKeyboardButton('Показать домашнее задание', callback_data='op_hometasks'))\
     .add(InlineKeyboardButton('Вернуться на главную', callback_data='menu'))
 
 inline_kb_nl2 = InlineKeyboardMarkup(row_width=2)\
     .add(InlineKeyboardButton('Следущая страница', callback_data='next'))\
     .add(InlineKeyboardButton('Предыдущая страница', callback_data='last'))\
-    .add(InlineKeyboardButton('Показать оценки', callback_data='btn4'))\
+    .add(InlineKeyboardButton('Показать оценки', callback_data='op_mark'))\
     .add(InlineKeyboardButton('Вернуться на главную', callback_data='menu'))
 
 inline_kb_nl3 = InlineKeyboardMarkup(row_width=2)\
-    .add(InlineKeyboardButton('Показать средний балл', callback_data='btn6'))\
+    .add(InlineKeyboardButton('Показать средний балл', callback_data='tab_scores'))\
     .add(InlineKeyboardButton('Вернуться на главную', callback_data='menu'))
 
 inline_kb_nl4 = InlineKeyboardMarkup(row_width=2)\
-    .add(InlineKeyboardButton('Показать оценки', callback_data='btn7'))\
+    .add(InlineKeyboardButton('Показать оценки', callback_data='tab_marks'))\
     .add(InlineKeyboardButton('Вернуться на главную', callback_data='menu'))
 
 inline_kb_nl5 = InlineKeyboardMarkup(row_width=2)\
-    .add(InlineKeyboardButton('Понедельник', callback_data='btn8'))\
-    .add(InlineKeyboardButton('Другие дни', callback_data='btn9'))\
-    .add(InlineKeyboardButton('Вернуться на главную', callback_data='menu1'))
+    .add(InlineKeyboardButton('Понедельник', callback_data='calls_mn'))\
+    .add(InlineKeyboardButton('Другие дни', callback_data='calls_2'))\
+    .add(InlineKeyboardButton('Вернуться на главную', callback_data='menu'))
 
 inline_kb_nl6 = InlineKeyboardMarkup(row_width=1)\
-    .add(InlineKeyboardButton('Вернуться на главную', callback_data='menu1'))
+    .add(InlineKeyboardButton('Вернуться на главную', callback_data='menu'))
 
 
 @dp.message_handler(commands=['start'])
@@ -63,7 +63,7 @@ async def send_welcome(message: types.Message, state: FSMContext):
                         reply_markup=inline_kb_full)
 
 
-@dp.callback_query_handler(lambda c: c.data == 'btn1')
+@dp.callback_query_handler(lambda c: c.data == 'marks')
 async def process_callback_button1(callback_query: types.CallbackQuery, state: FSMContext):
     await state.update_data(url_active='https://edu.tatar.ru/user/diary/week')
     data = await state.get_data()
@@ -133,7 +133,7 @@ async def process_callback_button1(callback_query: types.CallbackQuery, state: F
         await bot.send_message(callback_query.from_user.id, 'Еще недоступно')
 
 
-@dp.callback_query_handler(lambda c: c.data == 'btn4', state=UserState.url_active)
+@dp.callback_query_handler(lambda c: c.data == 'op_mark', state=UserState.url_active)
 async def process_callback_button1(callback_query: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
     await bot.answer_callback_query(callback_query.id)
@@ -143,7 +143,7 @@ async def process_callback_button1(callback_query: types.CallbackQuery, state: F
                            reply_markup=inline_kb_nl)
 
 
-@dp.callback_query_handler(lambda c: c.data == 'btn5', state=UserState.url_active)
+@dp.callback_query_handler(lambda c: c.data == 'op_hometasks', state=UserState.url_active)
 async def process_callback_button1(callback_query: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
     await bot.answer_callback_query(callback_query.id)
@@ -151,6 +151,21 @@ async def process_callback_button1(callback_query: types.CallbackQuery, state: F
     await bot.send_message(callback_query.from_user.id, marks.marks(data['login'], data['password'],
                                                                     data['url_active'], obj='task'),
                            reply_markup=inline_kb_nl2)
+
+
+@dp.message_handler(commands=['exit'], state=UserState.url_active)
+async def send_welcome(callback_query: types.CallbackQuery, state: FSMContext):
+    await state.finish()
+    await bot.send_message(callback_query.from_user.id, "Вы вышли из аккаунта\nВыберите что вам нужно",
+                           reply_markup=inline_kb_full)
+
+
+@dp.message_handler(commands=['menu'], state=UserState.url_active)
+async def process_callback_button1(callback_query: types.CallbackQuery, state: FSMContext):
+    await state.reset_state(with_data=False)
+    await bot.send_message(callback_query.from_user.id, "Выберите что вам нужно", reply_markup=inline_kb_full)
+    data = await state.get_data()
+    data['url_active'] = 'https://edu.tatar.ru/user/diary/week'
 
 
 @dp.callback_query_handler(lambda c: c.data == 'menu', state=UserState.url_active)
@@ -163,23 +178,16 @@ async def process_callback_button1(callback_query: types.CallbackQuery, state: F
     data['url_active'] = 'https://edu.tatar.ru/user/diary/week'
 
 
-@dp.callback_query_handler(lambda c: c.data == 'menu1')
+@dp.callback_query_handler(lambda c: c.data == 'calls')
 async def process_callback_button1(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
     await callback_query.message.delete()
-    await bot.send_message(callback_query.from_user.id, "Выберите что вам нужно", reply_markup=inline_kb_full)
-
-
-@dp.callback_query_handler(lambda c: c.data == 'btn2')
-async def process_callback_button1(callback_query: types.CallbackQuery):
-    await bot.answer_callback_query(callback_query.id)
-    await callback_query.message.delete()
+    await UserState.url_active.set()
     await bot.send_message(callback_query.from_user.id, 'Выберите день недели', reply_markup=inline_kb_nl5)
 
 
-@dp.callback_query_handler(lambda c: c.data == 'btn8')
-async def process_callback_button1(
-            callback_query: types.CallbackQuery):
+@dp.callback_query_handler(lambda c: c.data == 'calls_mn', state=UserState.url_active)
+async def process_callback_button1(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
     await callback_query.message.delete()
     await bot.send_message(callback_query.from_user.id, 'Понедельник:\n 1) 08:35 - 09:15 \n '
@@ -188,10 +196,11 @@ async def process_callback_button1(
                                                         '6) 12:40 - 13:20 \n Вторая смена: \n '
                                                         '1) 13:25 - 14:05 \n 2) 14:15 - 14:55 \n '
                                                         '3) 15:05 - 15:45 \n 4) 15:50 - 16:30 \n '
-                                                        '5) 16:35 - 17:15 \n 6) 17:20 - 18:00', reply_markup=inline_kb_nl6)
+                                                        '5) 16:35 - 17:15 \n 6) 17:20 - 18:00',
+                           reply_markup=inline_kb_nl6)
 
 
-@dp.callback_query_handler(lambda c: c.data == 'btn9')
+@dp.callback_query_handler(lambda c: c.data == 'calls_2', state=UserState.url_active)
 async def process_callback_button1(
             callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
@@ -206,7 +215,7 @@ async def process_callback_button1(
                                                         '6) 17:20 - 18:00', reply_markup=inline_kb_nl6)
 
 
-@dp.callback_query_handler(lambda c: c.data == 'btn3')
+@dp.callback_query_handler(lambda c: c.data == 'tabel')
 async def process_callback_button1(callback_query: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
     if data != {}:
@@ -245,7 +254,7 @@ async def get_address(message: types.Message, state: FSMContext):
         await UserState.loqin2.set()
 
 
-@dp.callback_query_handler(lambda c: c.data == 'btn6', state=UserState.url_active)
+@dp.callback_query_handler(lambda c: c.data == 'tab_scores', state=UserState.url_active)
 async def process_callback_button1(callback_query: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
     await bot.answer_callback_query(callback_query.id)
@@ -254,7 +263,7 @@ async def process_callback_button1(callback_query: types.CallbackQuery, state: F
                            reply_markup=inline_kb_nl4)
 
 
-@dp.callback_query_handler(lambda c: c.data == 'btn7', state=UserState.url_active)
+@dp.callback_query_handler(lambda c: c.data == 'tab_marks', state=UserState.url_active)
 async def process_callback_button1(callback_query: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
     await bot.answer_callback_query(callback_query.id)
